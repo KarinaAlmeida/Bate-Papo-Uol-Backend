@@ -10,7 +10,6 @@ server.use(cors());
 server.use(express.json());
 
 const mongoClient = new MongoClient(process.env.DATABASE_URL);
-const PORT= process.env.PORT
 let time= dayjs().format("HH:mm:ss");
 
 try{
@@ -80,6 +79,6 @@ res.status(201).send(message);
 
 
 
-server.listen(PORT, () => {
-    console.log(`Servidor rodando na porta: ${PORT}`)
+server.listen(5000, () => {
+    console.log(`Servidor rodando na porta: ${5000}`)
 })
