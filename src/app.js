@@ -21,6 +21,7 @@ console.log("banco conectado")
 }
 const db=mongoClient.db()
 
+
 server.post("/participants", async (req, res) => {
     const {name} = req.body;
 
@@ -53,6 +54,7 @@ server.get("/participants", async (req,res) => {
     }
 })
 
+
 server.post("/messages", async (req, res) => { 
 const {to, text, type} = req.body;
 const {user} = req.headers;
@@ -76,6 +78,60 @@ res.status(201).send(message);
 }
 
 })
+
+server.get("/messages/", async (req,res) => { 
+    const limit = req.query.limit;
+    const {user} = req.headers;
+
+    try {
+        const listaMensagens= await db.collection("messages").find({
+            $or :[ 
+             { type: "message" 
+             },
+             { type: "status"
+             },
+                
+            {  
+                type: "private_message",
+                to: user
+            },
+            {
+                type: "private_message",
+                from: user
+            }
+            ]
+        }).toArray();
+        
+        if (limit) {
+            return res.send(listaMensagens.slice(-limit));
+        }else{
+            return res.send(listaMensagens);
+        }
+    }catch (err) {
+        console.log(err);
+    }
+    
+})
+
+server.post("/status", async (req, res) => { 
+    const {user} = req.headers;
+    try{
+    const userNaLista = await db.collection("participants").findOne({name:user})
+    if (!userNaLista) return res.sendStatus(404)
+    await db.collection("participants").updateOne({ name:user}, 
+        {$set: {lastStatus: Date.now()}
+        
+    })
+
+    return res.sendStatus(200)
+
+    }catch (err) {
+        console.log(err);
+    }
+
+})
+
+
 
 
 
