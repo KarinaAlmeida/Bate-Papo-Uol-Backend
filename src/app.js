@@ -80,9 +80,9 @@ res.status(201).send(message);
 })
 
 server.get("/messages/", async (req,res) => { 
-    const limit = req.query.limit;
+    const limit = parseInt(req.query.limit);
     const {user} = req.headers;
-    if (limit <1) return res.sendStatus(422);
+   
 
     try {
         const listaMensagens= await db.collection("messages").find({
@@ -103,10 +103,14 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
-        if (limit ) {
-            return res.send(listaMensagens.slice(-limit));
-        }else{
+        if  (!limit){
             return res.send(listaMensagens);
+   
+        }else if(isNaN(limit) || limit <=0 ) {
+            return res.sendStatus(422);
+
+        }else  (limit >0 && limit <=listaMensagens.length){
+            return res.send(listaMensagens.slice(-limit));
         }
     }catch (err) {
         console.log(err);
