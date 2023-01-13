@@ -35,6 +35,7 @@ server.post("/participants", async (req, res) => {
             to: "Todos", 
             text: "entra na sala...", 
             type: "status",
+            from: name, 
             time: time})
 
         return res.sendStatus(201);
