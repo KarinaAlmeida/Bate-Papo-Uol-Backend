@@ -31,7 +31,6 @@ server.post("/participants", async (req, res) => {
         await db.collection("participants").insertOne({name,lastStatus: Date.now() })
 
         await db.collection("messages").insertOne({
-            from: name, 
             to: "Todos", 
             text: "entra na sala...", 
             type: "status",
@@ -83,6 +82,7 @@ res.status(201).send(message);
 server.get("/messages/", async (req,res) => { 
     const limit = req.query.limit;
     const {user} = req.headers;
+    if (limit <1) return res.sendStatus(422);
 
     try {
         const listaMensagens= await db.collection("messages").find({
@@ -103,7 +103,7 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
-        if (limit) {
+        if (limit ) {
             return res.send(listaMensagens.slice(-limit));
         }else{
             return res.send(listaMensagens);
