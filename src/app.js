@@ -109,7 +109,7 @@ server.get("/messages/", async (req,res) => {
         }else if(isNaN(limit) || limit <=0 ) {
             return res.sendStatus(422);
 
-        }else  (limit >0 && limit <=listaMensagens.length){
+        }else { (limit >0 && limit <=listaMensagens.length)
             return res.send(listaMensagens.slice(-limit));
         }
     }catch (err) {
