@@ -106,7 +106,7 @@ server.get("/messages/", async (req,res) => {
         if  (!limit){
             return res.send(listaMensagens);
    
-        }else if(isNaN(limit) || limit <=0 ) {
+        }else if(isNaN(limit) || limit <1 ) {
             return res.sendStatus(422);
 
         }else { (limit >0 && limit <=listaMensagens.length)
