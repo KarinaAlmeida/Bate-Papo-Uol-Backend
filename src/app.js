@@ -132,7 +132,30 @@ server.post("/status", async (req, res) => {
 })
 
 
+setInterval (removerUser, 15000)
 
+async function removerUser() {
+   const hora= Date.now()-10000;
+   try {
+    const usersOffline= await db.collection('participants').find({lastStatus:{$lt:hora}}).toArray();
+
+    usersOffline.map(async (item) => {
+        const mensagemRemovido= {
+            from: item.name, 
+            to: 'Todos', 
+            text: 'sai da sala...', 
+            type: 'status', 
+            time: time
+        };
+        await db.collection('messages').insertOne(mensagemRemovido);
+    })
+
+    await db.collection('participants').deleteMany({lastStatus:{$lt:hora}})
+
+   }catch (err) {
+    console.log(err);
+       }
+   }
 
 
 server.listen(5000, () => {
