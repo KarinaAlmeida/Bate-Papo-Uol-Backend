@@ -98,7 +98,7 @@ res.status(201).send(message);
 
 //ROTA GET MENSAGENS----------------------------------------------------------------
 server.get("/messages/", async (req,res) => { 
-    const limit = req.body.limit ? parseInt(req.query.limit) : false;
+    const limit = req.query.limit ? parseInt(req.query.limit) : false;
     const {user} = req.headers;
    
 
