@@ -122,7 +122,7 @@ server.get("/messages/", async (req,res) => {
         }).toArray();
         
         
-            if (isNaN(limit) || limit===0 || limit <0) {
+            if (isNaN(limit) || limit <0 || limit===0 ) {
                 return res.sendStatus(422);
 
             }else if (limit > 0){
