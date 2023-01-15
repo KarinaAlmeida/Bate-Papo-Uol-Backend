@@ -98,12 +98,11 @@ res.status(201).send(message);
 
 //ROTA GET MENSAGENS----------------------------------------------------------------
 server.get("/messages/", async (req,res) => { 
-    const {query} = req
+    const limit = req.query.limit ? parseInt(req.query.limit) : false;
     const {user} = req.headers;
    
 
     try {
-        
         const listaMensagens= await db.collection("messages").find({
             $or :[ 
              { type: "message" 
@@ -122,9 +121,8 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
-        const limit=Number(query.limit)
-
-            if (isNaN(limit) || limit <1) {
+        
+            if (isNaN(limit) || limit <0 || limit===0 ) {
                 return res.sendStatus(422);
 
             }else if (limit > 0){
