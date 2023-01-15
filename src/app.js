@@ -98,7 +98,7 @@ res.status(201).send(message);
 
 //ROTA GET MENSAGENS----------------------------------------------------------------
 server.get("/messages/", async (req,res) => { 
-    const limit = parseInt(req.query.limit);
+    const limit = req.body.limit ? parseInt(req.query.limit) : false;
     const {user} = req.headers;
    
 
@@ -121,18 +121,21 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
-        if  (!limit){
-            return res.send(listaMensagens.reverse());
-   
-        }else if(isNaN(limit) || limit <1 ) {
-            return res.sendStatus(422);
+        
+            if (isNaN(limit) || limit===0 || limit <0) {
+                return res.sendStatus(422);
 
-        }else { (limit >0 && limit <=listaMensagens.length)
-            return res.send(listaMensagens.slice(-limit).reverse());
+            }else if (limit > 0){
+                return res.send(listaMensagens.slice(-limit).reverse());
+
+            }else{
+                return res.send(listaMensagens.reverse());
+
+            }
+
+        }catch (err) {
+            console.log(err);
         }
-    }catch (err) {
-        console.log(err);
-    }
     
 })
 
