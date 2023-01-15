@@ -3,7 +3,9 @@ import cors from 'cors';
 import {MongoClient} from "mongodb";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
+import joi from "joi";
 
+//ATIVAÇÃO DE TODAS AS BIBLIOTECAS----------------------------------------------------------------
 const server = express();
 dotenv.config();
 server.use(cors());
@@ -22,8 +24,15 @@ console.log("banco conectado")
 const db=mongoClient.db()
 
 
+//ROTA POST PARTICIPANTES----------------------------------------------------------------
 server.post("/participants", async (req, res) => {
     const {name} = req.body;
+    const userSchema = joi.object({
+        name: joi.string().required(),
+      });
+      const validation= userSchema.validate (req.body)
+      if (validation.error) return res.sendStatus(422);
+
 
     try {
         const userUsado= await db.collection("participants").findOne({name})
@@ -44,6 +53,7 @@ server.post("/participants", async (req, res) => {
     }
 });
 
+//ROTA GET PARTICIPANTES----------------------------------------------------------------
 server.get("/participants", async (req,res) => {
     try{
     const listaParticipantes= await db.collection("participants").find({}).toArray();
@@ -54,10 +64,17 @@ server.get("/participants", async (req,res) => {
     }
 })
 
-
+//ROTA POST MENSAGENS----------------------------------------------------------------
 server.post("/messages", async (req, res) => { 
 const {to, text, type} = req.body;
 const {user} = req.headers;
+const messageSchema = joi.object({
+    to: joi.string().required(),
+    text: joi.string().required(),
+    type: joi.string().valid("message", "private_message").required(),
+  });
+  const validation= messageSchema.validate (req.body)
+  if (validation.error) return res.sendStatus(422);
 
 try {
     const userAtivo = await db.collection("participants").findOne({name:user})
@@ -79,8 +96,9 @@ res.status(201).send(message);
 
 })
 
+//ROTA GET MENSAGENS----------------------------------------------------------------
 server.get("/messages/", async (req,res) => { 
-    const limit = parseInt(req.query.limit);
+    const limit = req.body.limit ? parseInt(req.query.limit) : false;
     const {user} = req.headers;
    
 
@@ -103,21 +121,24 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
-        if  (!limit){
-            return res.send(listaMensagens.reverse());
-   
-        }else if(isNaN(limit) || limit <1 ) {
-            return res.sendStatus(422);
+            if (isNaN(limit) || limit <= 0) {
+                return res.sendStatus(422);
 
-        }else { (limit >0 && limit <=listaMensagens.length)
-            return res.send(listaMensagens.slice(-limit).reverse());
+            }else if (limit > 0){
+                return res.send(listaMensagens.slice(-limit).reverse());
+
+            }else{
+                return res.send(listaMensagens.reverse());
+
+            } 
+
+        }catch (err) {
+            console.log(err);
         }
-    }catch (err) {
-        console.log(err);
-    }
     
 })
 
+//ROTA POST DE STATUS----------------------------------------------------------------
 server.post("/status", async (req, res) => { 
     const {user} = req.headers;
     try{
@@ -163,6 +184,7 @@ async function removerUser() {
    }
 
 
+   //SERVIDOR--------------------------------------------------------------------------------
 server.listen(5000, () => {
     console.log(`Servidor rodando na porta: ${5000}`)
 })
