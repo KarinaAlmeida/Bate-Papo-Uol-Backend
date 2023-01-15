@@ -121,6 +121,7 @@ server.get("/messages/", async (req,res) => {
             ]
         }).toArray();
         
+        if  (limit || isNaN(limit) || limit===0){
             if (isNaN(limit) || limit <= 0) {
                 return res.sendStatus(422);
 
@@ -130,7 +131,7 @@ server.get("/messages/", async (req,res) => {
             }else{
                 return res.send(listaMensagens.reverse());
 
-            } 
+            } }
 
         }catch (err) {
             console.log(err);
